@@ -7,6 +7,8 @@
 int process_token(const char *text, const char *TokenType,
 		  const char *TokenVal, const int TokenID); 
 char *strnncpy(char *dst, const char *src, const int n);
+
+int comment_start_line;
 %}
 
  /* stany analizatora leksykalnego (INITIAL jest zdefiniowany) */
@@ -59,7 +61,6 @@ DOWNTO  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
 "<="  return process_token(yytext, "LE", "", LE);
 ">="  return process_token(yytext, "GE", "", GE);
 "!="  return process_token(yytext, "NEQ", "", NEQ);
-".."  return process_token(yytext, "RANGE", "", RANGE);
 ":="  return process_token(yytext, "ASSIGN", "", ASSIGN);
 
  /* E: detecting identifiers*/
@@ -97,9 +98,9 @@ DOWNTO  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
 }
 
  /* L: recognition of character constants in apostrophes using start conditions*/
-<INITIAL>"'"  BEGIN(CHAR_CONST);
+<INITIAL>\'  BEGIN(CHAR_CONST);
  /* In CHAR_CONST state, match a single character followed by a closing quote */
-<CHAR_CONST>[^']"'""  {
+<CHAR_CONST>[^']'  {
     /* Valid character constant found */
     return process_token(yytext, "CHAR_CONST", yytext, CHAR_CONST);
     BEGIN(INITIAL);  /* Return to INITIAL state after recognizing a valid character */
@@ -107,11 +108,6 @@ DOWNTO  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
  /* If a single quote is encountered inside CHAR_CONST without a preceding character, it's an error */
 <CHAR_CONST>"'"  {
     fprintf(stderr, "Error: Empty character constant at line %d\n", yylineno);
-    BEGIN(INITIAL);
-}
- /* Handle any unmatched characters in CHAR_CONST state as errors */
-<CHAR_CONST>.  {
-    fprintf(stderr, "Error: Invalid character constant at line %d\n", yylineno);
     BEGIN(INITIAL);
 }
  /* Handle end-of-file (EOF) if still in CHAR_CONST state */
@@ -132,8 +128,6 @@ DOWNTO  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
 }
 
  /* O: detection of failure to close a comment with indications of the line where the comment begins*/
-int comment_start_line;  /* Variable to store the line number where the comment starts */
-
 <INITIAL>"/*"  {
     BEGIN(COMMENT);
     comment_start_line = yylineno;
@@ -143,7 +137,6 @@ int comment_start_line;  /* Variable to store the line number where the comment 
 <COMMENT>.  ;  /* Ignore all other characters in COMMENT state */
 <COMMENT>\n ;  /* Ignore new lines in COMMENT state */
 <COMMENT><<EOF>>  {
-    /* If we reach the end of the file while still in COMMENT state, it means the comment was not closed */
     fprintf(stderr, "Error: Unclosed multi-line comment starting at line %d\n", comment_start_line);
     BEGIN(INITIAL);  /* Reset to INITIAL state */
 }
