@@ -14,7 +14,7 @@ char *strnncpy(char *dst, const char *src, const int n);
 %x ST_COMMENT
 %x STRING
 %x CHAR_CONST_STATE
-%x COMMENT_STATE
+%x COMMENT
 %x ORPHANED_COMMENT_STATE
 
 
@@ -24,40 +24,40 @@ char *strnncpy(char *dst, const char *src, const int n);
 
 /* B: keywords*/
 
-"and" return process_token(yytext, "KW_AND", "", KW_AND);
-"begin" return process_token(yytext, "KW_BEGIN", "", KW_BEGIN);
-"const" return process_token(yytext, "KW_CONST", "", KW_CONST);
-"div" return process_token(yytext, "KW_DIV", "", KW_DIV);
-"do"  return process_token(yytext, "KW_DO", "", KW_DO);
-"else"  return process_token(yytext, "KW_ELSE", "", KW_ELSE);
-"elsif" return process_token(yytext, "KW_ELSIF", "", KW_ELSIF);
-"end" return process_token(yytext, "KW_END", "", KW_END);
-"for" return process_token(yytext, "KW_FOR", "", KW_FOR);
-"from"  return process_token(yytext, "KW_FROM", "", KW_FROM);
-"if"  return process_token(yytext, "KW_IF", "", KW_IF);
-"import"  return process_token(yytext, "KW_IMPORT", "", KW_IMPORT);
-"in"  return process_token(yytext, "KW_IN", "", KW_IN);
-"mod" return process_token(yytext, "KW_MOD", "", KW_MOD);
-"module"  return process_token(yytext, "KW_MODULE", "", KW_MODULE);
-"not" return process_token(yytext, "KW_NOT", "", KW_NOT);
-"or" return process_token(yytext, "KW_OR", "", KW_OR);
-"then"  return process_token(yytext, "KW_THEN", "", KW_THEN);
-"type"  return process_token(yytext, "KW_TYPE", "", KW_TYPE);
-"to"  return process_token(yytext, "KW_TO", "", KW_TO);
-"var" return process_token(yytext, "KW_VAR", "", KW_VAR);
-"while" return process_token(yytext, "KW_WHILE", "", KW_WHILE);
-"repeat"  return process_token(yytext, "KW_REPEAT", "", KW_REPEAT);
-"until" return process_token(yytext, "KW_UNTIL", "", KW_UNTIL);
-"loop"  return process_token(yytext, "KW_LOOP", "", KW_LOOP);
-"case"  return process_token(yytext, "KW_CASE", "", KW_CASE);
-"of"  return process_token(yytext, "KW_OF", "", KW_OF);
-"array" return process_token(yytext, "KW_ARRAY", "", KW_ARRAY);
-"record"  return process_token(yytext, "KW_RECORD", "", KW_RECORD);
-"downto"  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
+"AND" return process_token(yytext, "KW_AND", "", KW_AND);
+"BEGIN" return process_token(yytext, "KW_BEGIN", "", KW_BEGIN);
+"CONST" return process_token(yytext, "KW_CONST", "", KW_CONST);
+"DIV" return process_token(yytext, "KW_DIV", "", KW_DIV);
+"DO"  return process_token(yytext, "KW_DO", "", KW_DO);
+"ELSE"  return process_token(yytext, "KW_ELSE", "", KW_ELSE);
+"ELSIF" return process_token(yytext, "KW_ELSIF", "", KW_ELSIF);
+"END" return process_token(yytext, "KW_END", "", KW_END);
+"FOR" return process_token(yytext, "KW_FOR", "", KW_FOR);
+"FROM"  return process_token(yytext, "KW_FROM", "", KW_FROM);
+"IF"  return process_token(yytext, "KW_IF", "", KW_IF);
+"IMPORT"  return process_token(yytext, "KW_IMPORT", "", KW_IMPORT);
+"IN"  return process_token(yytext, "KW_IN", "", KW_IN);
+"MOD" return process_token(yytext, "KW_MOD", "", KW_MOD);
+"MODULE"  return process_token(yytext, "KW_MODULE", "", KW_MODULE);
+"NOT" return process_token(yytext, "KW_NOT", "", KW_NOT);
+"OR" return process_token(yytext, "KW_OR", "", KW_OR);
+"THEN"  return process_token(yytext, "KW_THEN", "", KW_THEN);
+"TYPE"  return process_token(yytext, "KW_TYPE", "", KW_TYPE);
+"TO"  return process_token(yytext, "KW_TO", "", KW_TO);
+"VAR" return process_token(yytext, "KW_VAR", "", KW_VAR);
+"WHILE" return process_token(yytext, "KW_WHILE", "", KW_WHILE);
+"REPEAT"  return process_token(yytext, "KW_REPEAT", "", KW_REPEAT);
+"UNTIL" return process_token(yytext, "KW_UNTIL", "", KW_UNTIL);
+"LOOP"  return process_token(yytext, "KW_LOOP", "", KW_LOOP);
+"CASE"  return process_token(yytext, "KW_CASE", "", KW_CASE);
+"OF"  return process_token(yytext, "KW_OF", "", KW_OF);
+"ARRAY" return process_token(yytext, "KW_ARRAY", "", KW_ARRAY);
+"RECORD"  return process_token(yytext, "KW_RECORD", "", KW_RECORD);
+"DOWNTO"  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
 
- /* C: removal of white spaces */
+/* C: removal of white spaces */
 
-[ \t\n\r]+ 
+[[:blank:]\n] ;
 
 /* D: detecting multi-char operators*/
 
@@ -93,64 +93,42 @@ char *strnncpy(char *dst, const char *src, const int n);
 
 /* K: detecting strings in quotes using initial conditions*/
 
-/* Detect the opening quote and switch to STRING state */
-\"                  BEGIN(STRING);
 
-<STRING>[^\"\\\n]*  /* Match any character sequence inside the quotes that is not a backslash or newline */
-                    ;
-
-<STRING>\\[^\n]     /* Match escape sequences inside the string */
-                    ;
-
-<STRING>\"          { /* Closing quote */
-                        BEGIN(INITIAL);
-                        return process_token(yytext, "STRING_CONST", yytext, STRING_CONST);
-                    }"
+/* L: recognition of character constants in apostrophes using start conditions*/
 
 
-/* L: detecting character constants in single quotes using initial conditions*/
+/* M: removal of multi-line comments using start conditions*/
 
-\'                  BEGIN(CHAR_CONST_STATE);
+<INITIAL>"/*" BEGIN(COMMENT);
+<COMMENT>"*/" BEGIN(INITIAL);
+<COMMENT>.  ;
+<COMMENT>\n  ;
 
-<CHAR_CONST_STATE>[^\'\\\n]   /* Match any single character except single quote and newline */
-                      ;
+/* N: detection of comment end sequence without the beginning sequence using start conditions*/
 
-<CHAR_CONST_STATE>\\[^\n]      /* Match escape sequences (like \' or \\) */
-                      ;
-
-<CHAR_CONST_STATE>\'            { /* Closing single quote */
-                                    BEGIN(INITIAL);
-                                    return process_token(yytext, "CHAR_CONST", yytext, CHAR_CONST);
-                                }'
-
-/* M: removal of multi-line comments using initial conditions*/
-
-/* Detect the opening of a multi-line comment and switch to COMMENT_STATE */
-/\*                  BEGIN(COMMENT_STATE);
-<COMMENT_STATE>[^*]*; /* Match any characters except for '*' */
-<COMMENT_STATE>\*[^/];  /* Match '*' but not the ending '/' */
-<COMMENT_STATE>\*/
-{ /* Closing multi-line comment */
-  BEGIN(INITIAL);
-  /* No action needed, comment is ignored */
+<INITIAL>"*/"  {
+    fprintf(stderr, "Error: Comment closing sequence '*/' found without matching opening sequence at line %d\n", yylineno);
 }
 
+/* O: detection of failure to close a comment with indications of the line where the comment begins*/
 
-/* N: detecting closing characters for a comment without starting it using start conditions*/
-/* Detect an orphaned closing comment */
-\*/                 BEGIN(ORPHANED_COMMENT_STATE);
+int comment_start_line;  /* Variable to store the line number where the comment starts */
 
-<ORPHANED_COMMENT_STATE>[^*]*; /* Match any characters except '*' */
-<ORPHANED_COMMENT_STATE>\*[^/];  /* Match '*' but not the ending '/' */
-<ORPHANED_COMMENT_STATE>\*/ 
-{ 
-  BEGIN(INITIAL);
-  printf("Warning: Orphaned closing comment on line %d\n", yylineno);
+<INITIAL>"/*"  {
+    BEGIN(COMMENT);
+    comment_start_line = yylineno;
 }
 
+<COMMENT>"*/" BEGIN(INITIAL);
+<COMMENT>.  ;  /* Ignore all other characters in COMMENT state */
+<COMMENT>\n ;  /* Ignore new lines in COMMENT state */
 
-/* O: detecting an open comment with indication of its starting line using conditions
-initial*/
+<COMMENT><<EOF>>  {
+    /* If we reach the end of the file while still in COMMENT state, it means the comment was not closed */
+    fprintf(stderr, "Error: Unclosed multi-line comment starting at line %d\n", comment_start_line);
+    BEGIN(INITIAL);  /* Reset to INITIAL state */
+}
+
 
 %%
 
