@@ -67,7 +67,7 @@ OTHER: IDENT | ',' | ';' | '=' | ':' | '(' | ')' | '+' | '*' | '-' | '.' | '|'
 
 int main( void )
 { 
-	printf( "Imie i Nazwisko\n" );
+	printf( "Maksymilian Kempa\n" );
 	printf( "yytext              Typ tokena         Wartosc tokena znakowo\n\n" );
 	yyparse();
 	return( 0 ); // OK
