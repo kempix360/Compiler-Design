@@ -13,7 +13,7 @@ char *strnncpy(char *dst, const char *src, const int n);
 %option yylineno
 %x ST_COMMENT
 %x STRING
-%x CHAR_CONST_STATE
+%x CHAR_CONST
 %x COMMENT
 %x ORPHANED_COMMENT_STATE
 
@@ -23,7 +23,6 @@ char *strnncpy(char *dst, const char *src, const int n);
 %%
 
 /* B: keywords*/
-
 "AND" return process_token(yytext, "KW_AND", "", KW_AND);
 "BEGIN" return process_token(yytext, "KW_BEGIN", "", KW_BEGIN);
 "CONST" return process_token(yytext, "KW_CONST", "", KW_CONST);
@@ -93,9 +92,49 @@ char *strnncpy(char *dst, const char *src, const int n);
 
 /* K: detecting strings in quotes using initial conditions*/
 
+<INITIAL>"\"" BEGIN(STRING);
+/* In the STRING state, match any characters except for a double quote and newline */
+<STRING>[^"\""\n]*  ;
+/* If a closing double quote is found, recognize the string and return to INITIAL state */
+<STRING>"\""  {
+    return process_token(yytext, "STRING_CONST", yytext, STRING_CONST);
+    BEGIN(INITIAL);  /* Return to INITIAL state after recognizing a valid string */
+}
+/* If a newline character is encountered in the STRING state, it's an unterminated string error */
+<STRING>\n  {
+    fprintf(stderr, "Error: Unterminated string constant at line %d\n", yylineno);
+    BEGIN(INITIAL);  /* Return to INITIAL state */
+}
+/* Handle end-of-file (EOF) if still in STRING state */
+<STRING><<EOF>>  {
+    fprintf(stderr, "Error: Unterminated string constant at line %d\n", yylineno);
+    BEGIN(INITIAL);  /* Return to INITIAL state */
+}
 
 /* L: recognition of character constants in apostrophes using start conditions*/
 
+<INITIAL>"'"  BEGIN(CHAR_CONST);
+/* In CHAR_CONST state, match a single character followed by a closing quote */
+<CHAR_CONST>[^']"'""  {
+    /* Valid character constant found */
+    return process_token(yytext, "CHAR_CONST", yytext, CHAR_CONST);
+    BEGIN(INITIAL);  /* Return to INITIAL state after recognizing a valid character */
+}
+/* If a single quote is encountered inside CHAR_CONST without a preceding character, it's an error */
+<CHAR_CONST>"'"  {
+    fprintf(stderr, "Error: Empty character constant at line %d\n", yylineno);
+    BEGIN(INITIAL);
+}
+/* Handle any unmatched characters in CHAR_CONST state as errors */
+<CHAR_CONST>.  {
+    fprintf(stderr, "Error: Invalid character constant at line %d\n", yylineno);
+    BEGIN(INITIAL);
+}
+/* Handle end-of-file (EOF) if still in CHAR_CONST state */
+<CHAR_CONST><<EOF>>  {
+    fprintf(stderr, "Error: Unterminated character constant at line %d\n", yylineno);
+    BEGIN(INITIAL);
+}
 
 /* M: removal of multi-line comments using start conditions*/
 
@@ -122,7 +161,6 @@ int comment_start_line;  /* Variable to store the line number where the comment 
 <COMMENT>"*/" BEGIN(INITIAL);
 <COMMENT>.  ;  /* Ignore all other characters in COMMENT state */
 <COMMENT>\n ;  /* Ignore new lines in COMMENT state */
-
 <COMMENT><<EOF>>  {
     /* If we reach the end of the file while still in COMMENT state, it means the comment was not closed */
     fprintf(stderr, "Error: Unclosed multi-line comment starting at line %d\n", comment_start_line);
