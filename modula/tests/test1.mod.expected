@@ -1,0 +1,269 @@
+First and Family Name
+yytext              Token Type         Token value as string
+
+MODULE              KW_MODULE       
+test                IDENT           test
+;                   ;               
+FROM                KW_FROM         
+InOut               IDENT           InOut
+IMPORT              KW_IMPORT       
+Write               IDENT           Write
+,                   ,               
+WriteCard           IDENT           WriteCard
+,                   ,               
+WriteString         IDENT           WriteString
+,                   ,               
+WriteLn             IDENT           WriteLn
+;                   ;               
+CONST               KW_CONST        
+FromAscii           IDENT           FromAscii
+=                   =               
+32                  INTEGER_CONST   32
+;                   ;               
+ToAscii             IDENT           ToAscii
+=                   =               
+127                 INTEGER_CONST   127
+;                   ;               
+VAR                 KW_VAR          
+i                   IDENT           i
+:                   :               
+CARDINAL            IDENT           CARDINAL
+;                   ;               
+fl                  IDENT           fl
+:                   :               
+REAL                IDENT           REAL
+;                   ;               
+t                   IDENT           t
+:                   :               
+ARRAY               KW_ARRAY        
+[                   [               
+1                   INTEGER_CONST   1
+..                  RANGE           
+10                  INTEGER_CONST   10
+]                   ]               
+OF                  KW_OF           
+CARDINAL            IDENT           CARDINAL
+;                   ;               
+d                   IDENT           d
+:                   :               
+RECORD              KW_RECORD       
+year                IDENT           year
+,                   ,               
+month               IDENT           month
+:                   :               
+CARDINAL            IDENT           CARDINAL
+;                   ;               
+day                 IDENT           day
+:                   :               
+CARDINAL            IDENT           CARDINAL
+;                   ;               
+END                 KW_END          
+;                   ;               
+BEGIN               KW_BEGIN        
+WriteString         IDENT           WriteString
+(                   (               
+"ASCII "            STRING_CONST    "ASCII "
+)                   )               
+;                   ;               
+WriteString         IDENT           WriteString
+(                   (               
+"codes: "           STRING_CONST    "codes: "
+)                   )               
+;                   ;               
+WriteLn             IDENT           WriteLn
+;                   ;               
+FOR                 KW_FOR          
+i                   IDENT           i
+:=                  ASSIGN          
+FromAscii           IDENT           FromAscii
+TO                  KW_TO           
+ToAscii             IDENT           ToAscii
+DO                  KW_DO           
+WriteCard           IDENT           WriteCard
+(                   (               
+i                   IDENT           i
+,                   ,               
+3                   INTEGER_CONST   3
+)                   )               
+;                   ;               
+Write               IDENT           Write
+(                   (               
+' '                 CHAR_CONST      ' '
+)                   )               
+;                   ;               
+Write               IDENT           Write
+(                   (               
+CHR                 IDENT           CHR
+(                   (               
+i                   IDENT           i
+)                   )               
+)                   )               
+;                   ;               
+WriteLn             IDENT           WriteLn
+END                 KW_END          
+;                   ;               
+fl                  IDENT           fl
+:=                  ASSIGN          
+1.1                 FLOAT_CONST     1.1
++                   +               
+1.0E-2              FLOAT_CONST     1.0E-2
++                   +               
+1.0E+2              FLOAT_CONST     1.0E+2
++                   +               
+1.0E1               FLOAT_CONST     1.0E1
+;                   ;               
+IF                  KW_IF           
+(                   (               
+fl                  IDENT           fl
+<=                  LE              
+11.11               FLOAT_CONST     11.11
+)                   )               
+AND                 KW_AND          
+(                   (               
+fl                  IDENT           fl
+>=                  GE              
+1.111E1             FLOAT_CONST     1.111E1
+)                   )               
+THEN                KW_THEN         
+WriteString         IDENT           WriteString
+(                   (               
+"As expected"       STRING_CONST    "As expected"
+)                   )               
+ELSE                KW_ELSE         
+WriteString         IDENT           WriteString
+(                   (               
+"No way!"           STRING_CONST    "No way!"
+)                   )               
+END                 KW_END          
+;                   ;               
+WriteLn             IDENT           WriteLn
+;                   ;               
+i                   IDENT           i
+:=                  ASSIGN          
+1                   INTEGER_CONST   1
+;                   ;               
+WHILE               KW_WHILE        
+i                   IDENT           i
+<                   <               
+5                   INTEGER_CONST   5
+DO                  KW_DO           
+WriteLn             IDENT           WriteLn
+(                   (               
+i                   IDENT           i
+)                   )               
+;                   ;               
+i                   IDENT           i
+:=                  ASSIGN          
+i                   IDENT           i
++                   +               
+1                   INTEGER_CONST   1
+END                 KW_END          
+;                   ;               
+REPEAT              KW_REPEAT       
+WriteLn             IDENT           WriteLn
+(                   (               
+i                   IDENT           i
+)                   )               
+;                   ;               
+i                   IDENT           i
+:=                  ASSIGN          
+i                   IDENT           i
+-                   -               
+1                   INTEGER_CONST   1
+UNTIL               KW_UNTIL        
+i                   IDENT           i
+=                   =               
+1                   INTEGER_CONST   1
+;                   ;               
+LOOP                KW_LOOP         
+WriteLn             IDENT           WriteLn
+(                   (               
+"Spam"              STRING_CONST    "Spam"
+)                   )               
+END                 KW_END          
+;                   ;               
+CASE                KW_CASE         
+CHR                 IDENT           CHR
+(                   (               
+FromAscii           IDENT           FromAscii
++                   +               
+16                  INTEGER_CONST   16
+)                   )               
+OF                  KW_OF           
+'0'                 CHAR_CONST      '0'
+:                   :               
+WriteLn             IDENT           WriteLn
+(                   (               
+"Aha!"              STRING_CONST    "Aha!"
+)                   )               
+|                   |               
+'A'                 CHAR_CONST      'A'
+,                   ,               
+'a'                 CHAR_CONST      'a'
+:                   :               
+Writeln             IDENT           Writeln
+(                   (               
+"Yes?"              STRING_CONST    "Yes?"
+)                   )               
+ELSE                KW_ELSE         
+Writeln             IDENT           Writeln
+(                   (               
+"O!"                STRING_CONST    "O!"
+)                   )               
+END                 KW_END          
+;                   ;               
+t                   IDENT           t
+[                   [               
+10                  INTEGER_CONST   10
+]                   ]               
+=                   =               
+10                  INTEGER_CONST   10
+;                   ;               
+FOR                 KW_FOR          
+i                   IDENT           i
+:=                  ASSIGN          
+9                   INTEGER_CONST   9
+DOWNTO              KW_DOWNTO       
+1                   INTEGER_CONST   1
+DO                  KW_DO           
+t                   IDENT           t
+[                   [               
+i                   IDENT           i
+]                   ]               
+:=                  ASSIGN          
+t                   IDENT           t
+[                   [               
+i                   IDENT           i
++                   +               
+1                   INTEGER_CONST   1
+]                   ]               
+*                   *               
+i                   IDENT           i
+*                   *               
+i                   IDENT           i
+END                 KW_END          
+;                   ;               
+d                   IDENT           d
+.                   .               
+year                IDENT           year
+:=                  ASSIGN          
+2018                INTEGER_CONST   2018
+;                   ;               
+d                   IDENT           d
+.                   .               
+day                 IDENT           day
+:=                  ASSIGN          
+1                   INTEGER_CONST   1
+;                   ;               
+d                   IDENT           d
+.                   .               
+month               IDENT           month
+:=                  ASSIGN          
+d                   IDENT           d
+.                   .               
+day                 IDENT           day
+*                   *               
+10                  INTEGER_CONST   10
+END                 KW_END          
+test                IDENT           test
+.                   .               

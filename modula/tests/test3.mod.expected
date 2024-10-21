@@ -1,0 +1,109 @@
+First and Family Name
+yytext              Token Type         Token value as string
+
+MODULE              KW_MODULE       
+test                IDENT           test
+;                   ;               
+FROM                KW_FROM         
+InOut               IDENT           InOut
+IMPORT              KW_IMPORT       
+Write               IDENT           Write
+,                   ,               
+WriteCard           IDENT           WriteCard
+,                   ,               
+WriteString         IDENT           WriteString
+,                   ,               
+WriteLn             IDENT           WriteLn
+;                   ;               
+CONST               KW_CONST        
+FromAscii           IDENT           FromAscii
+=                   =               
+32                  INTEGER_CONST   32
+;                   ;               
+ToAscii             IDENT           ToAscii
+=                   =               
+127                 INTEGER_CONST   127
+;                   ;               
+VAR                 KW_VAR          
+i                   IDENT           i
+:                   :               
+CARDINAL            IDENT           CARDINAL
+;                   ;               
+fl                  IDENT           fl
+:                   :               
+REAL                IDENT           REAL
+;                   ;               
+BEGIN               KW_BEGIN        
+WriteString         IDENT           WriteString
+(                   (               
+"ASCII "            STRING_CONST    "ASCII "
+)                   )               
+;                   ;               
+WriteString         IDENT           WriteString
+(                   (               
+"codes: "           STRING_CONST    "codes: "
+)                   )               
+;                   ;               
+WriteLn             IDENT           WriteLn
+;                   ;               
+FOR                 KW_FOR          
+i                   IDENT           i
+:=                  ASSIGN          
+FromAscii           IDENT           FromAscii
+TO                  KW_TO           
+ToAscii             IDENT           ToAscii
+DO                  KW_DO           
+WriteCard           IDENT           WriteCard
+(                   (               
+i                   IDENT           i
+,                   ,               
+3                   INTEGER_CONST   3
+)                   )               
+;                   ;               
+Write               IDENT           Write
+(                   (               
+' '                 CHAR_CONST      ' '
+)                   )               
+;                   ;               
+Write               IDENT           Write
+(                   (               
+CHR                 IDENT           CHR
+(                   (               
+i                   IDENT           i
+)                   )               
+)                   )               
+;                   ;               
+WriteLn             IDENT           WriteLn
+END                 KW_END          
+;                   ;               
+fl                  IDENT           fl
+:=                  ASSIGN          
+1.1                 FLOAT_CONST     1.1
++                   +               
+1.0E-2              FLOAT_CONST     1.0E-2
++                   +               
+1.0E+2              FLOAT_CONST     1.0E+2
++                   +               
+1.0E1               FLOAT_CONST     1.0E1
+;                   ;               
+IF                  KW_IF           
+(                   (               
+fl                  IDENT           fl
+<=                  LE              
+11.11               FLOAT_CONST     11.11
+)                   )               
+AND                 KW_AND          
+(                   (               
+fl                  IDENT           fl
+>=                  GE              
+1.111E1             FLOAT_CONST     1.111E1
+)                   )               
+THEN                KW_THEN         
+WriteString         IDENT           WriteString
+(                   (               
+"As expected"       STRING_CONST    "As expected"
+)                   )               
+ELSE                KW_ELSE         
+WriteString         IDENT           WriteString
+(                   (               
+Double quotes opened in line 30 not closed

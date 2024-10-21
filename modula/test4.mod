@@ -14,11 +14,6 @@ CONST
 VAR
   i : CARDINAL;
   fl : REAL;
-  t : ARRAY[1 .. 10] OF CARDINAL;
-  d : RECORD
-       year, month : CARDINAL;
-       day : CARDINAL;
-  END;
 BEGIN
   WriteString("ASCII "); WriteString("codes: ");
   WriteLn;
@@ -42,18 +37,13 @@ BEGIN
   REPEAT
        WriteLn(i); i := i - 1
   UNTIL i = 1;
-  LOOP
+  LOOP *) (* closing a comment without opening it *)
        WriteLn("Spam")
   END;
   CASE CHR(FromAscii+16) OF
        '0': WriteLn("Aha!")
-     | 'A','a': Writeln("Yes?")
-  ELSE
+     | 'A,'a': Writeln("Yes?") (* missing second single quote *)
+  ELSE (* This comment is unfinished
        Writeln("O!")
-  END;
-  t[10] = 10;
-  FOR i := 9 DOWNTO 1 DO t[i] := t[i+1] * i * i END;
-  d.year := 2018; d.day:= 1;
-  d.month := d.day * 10
+  END
 END test.
- 

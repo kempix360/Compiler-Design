@@ -93,8 +93,9 @@ extern int yydebug;
     LE = 294,                      /* LE  */
     GE = 295,                      /* GE  */
     NEQ = 296,                     /* NEQ  */
-    IDENT = 297,                   /* IDENT  */
-    NEG = 298                      /* NEG  */
+    RANGE = 297,                   /* RANGE  */
+    IDENT = 298,                   /* IDENT  */
+    NEG = 299                      /* NEG  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -109,7 +110,7 @@ union YYSTYPE
   int i;
   double d;
 
-#line 113 "modula.tab.h"
+#line 114 "modula.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

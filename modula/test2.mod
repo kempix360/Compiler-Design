@@ -1,12 +1,12 @@
 (********************************************************)
-(* Program pokazuje kody ASCII                          *)
-(* Kompilacja:                                          *)
+(* Program displays ASCII codes                         *)
+(* Compilation:                                         *)
 (*   m2c -all test.mod -o test                          *)
-(* Uruchomienie:                                        *)
+(* Running:                                             *)
 (*   ./test                                             *)
 (********************************************************)
 MODULE test;
-
+ 
 FROM InOut IMPORT Write, WriteCard, WriteString, WriteLn;
 CONST
   FromAscii = 32;
@@ -15,7 +15,7 @@ VAR
   i : CARDINAL;
   fl : REAL;
 BEGIN
-  WriteString("Kody"); WriteString(" ASCII");
+  WriteString("ASCII "); WriteString("codes: ");
   WriteLn;
   FOR i := FromAscii TO ToAscii DO
     WriteCard(i, 3);
@@ -23,11 +23,11 @@ BEGIN
     Write(CHR(i));
     WriteLn
   END;
-  fl := 1.1 + 1.0E-2 + 1.0E+2 + 1.0E1; (* liczby rzeczywiste *)
+  fl := 1.1 + 1.0E-2 + 1.0E+2 + 1.0E1; (* real numbers *)
   IF (fl <= 11.11) AND (fl >= 1.111E1) THEN
-    WriteString("Zgodnie z oczekiwaniami")
+    WriteString("As expected")
   ELSE
-    WriteString("Olaboga!")
+    WriteString("No way!")
   END;
   WriteLn;
   i := 1;
@@ -37,13 +37,13 @@ BEGIN
   REPEAT
        WriteLn(i); i := i - 1
   UNTIL i = 1;
-  LOOP *) (* zamkniecie komentarza bez otwarcia *)
+  LOOP *) (* closing a comment without opening it *)
        WriteLn("Spam")
   END;
   CASE CHR(FromAscii+16) OF
        '0': WriteLn("Aha!")
-     | 'A','a': Writeln("Tak?")
-  ELSE (* Ten komentarz nie ma zamkniecia
+     | 'A','a': Writeln("Yes?")
+  ELSE (* This comment is unfinished
        Writeln("O!")
   END
 END test.

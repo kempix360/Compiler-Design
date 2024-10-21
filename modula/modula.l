@@ -8,13 +8,14 @@ int process_token(const char *text, const char *TokenType,
 		  const char *TokenVal, const int TokenID); 
 char *strnncpy(char *dst, const char *src, const int n);
 
+int comment_close_line;
 int comment_start_line;
 %}
 
  /* stany analizatora leksykalnego (INITIAL jest zdefiniowany) */
 %option yylineno
-%x STRING
-%x CHAR_CONST
+%x DOUBLE_QUOTE
+%x SINGLE_QUOTE
 %x COMMENT
 
 
@@ -62,15 +63,16 @@ DOWNTO  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
 ">="  return process_token(yytext, "GE", "", GE);
 "!="  return process_token(yytext, "NEQ", "", NEQ);
 ":="  return process_token(yytext, "ASSIGN", "", ASSIGN);
+".."  return process_token(yytext, "RANGE", "", RANGE);
 
  /* E: detecting identifiers*/
 [[:alpha:]][[:alpha:][:digit:]]* return process_token(yytext, "IDENT", yytext, IDENT);
 
  /* F: detecting integers*/
-[+-]?[[:digit:]]+  return process_token(yytext, "INTEGER_CONST", yytext, INTEGER_CONST);
+[[:digit:]]+  return process_token(yytext, "INTEGER_CONST", yytext, INTEGER_CONST);
 
  /* G: detecting real numbers*/
-[+-]?[[:digit:]]*\.[[:digit:]]*([eE][-+]?[[:digit:]]+)?  return process_token(yytext, "REAL_CONST", yytext, REAL_CONST);
+[[:digit:]][[:digit:]]*\.[[:digit:]]*([eE][-+]?[[:digit:]]+)?  return process_token(yytext, "FLOAT_CONST", yytext, REAL_CONST);
 
  /* H: detecting text constants (strings) in quotation marks without using the initial condition mechanism*/
 \"[^\"\n]*\" return process_token(yytext, "STRING_CONST", yytext, STRING_CONST);
@@ -79,66 +81,56 @@ DOWNTO  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
 \'[^\'\n]\' return process_token(yytext, "CHAR_CONST", yytext, CHAR_CONST);
 
  /* J: detecting single-character ending symbols: operators, punctuation*/
-[+\-*/=(),.;:{}]  return process_token(yytext, yytext, "", yytext[0]);
+[+\-*/=()\[\],.;<>|:{}]  return process_token(yytext, yytext, "", yytext[0]);
 
  /* K: detecting strings in quotes using initial conditions*/
-<INITIAL>\" BEGIN(STRING);
-<STRING>[^\"\n]*  ;
-<STRING>\"  {
+<INITIAL>\" BEGIN(DOUBLE_QUOTE);
+<DOUBLE_QUOTE>[^\"\n]*  ;
+<DOUBLE_QUOTE>\"  {
     return process_token(yytext, "STRING_CONST", yytext, STRING_CONST);
-    BEGIN(INITIAL);  /* Return to INITIAL state after recognizing a valid string */
+    BEGIN(INITIAL);
 }
-<STRING>\n  {
-    fprintf(stderr, "Error: Unterminated string constant at line %d\n", yylineno);
-    BEGIN(INITIAL);  /* Return to INITIAL state */
+<DOUBLE_QUOTE>\n  {
+    printf("Error: Unterminated string constant at line %d\n", yylineno);
+    BEGIN(INITIAL);
 }
-<STRING><<EOF>>  {
-    fprintf(stderr, "Error: Unterminated string constant at line %d\n", yylineno);
-    BEGIN(INITIAL);  /* Return to INITIAL state */
+<DOUBLE_QUOTE><<EOF>>  {
+    printf("Error: Unterminated string constant at line %d\n", yylineno);
+    yyterminate();
 }
 
  /* L: recognition of character constants in apostrophes using start conditions*/
-<INITIAL>\'  BEGIN(CHAR_CONST);
- /* In CHAR_CONST state, match a single character followed by a closing quote */
-<CHAR_CONST>[^']'  {
-    /* Valid character constant found */
+<INITIAL>'  BEGIN(SINGLE_QUOTE);
+<SINGLE_QUOTE>[^'\n]'  {
     return process_token(yytext, "CHAR_CONST", yytext, CHAR_CONST);
-    BEGIN(INITIAL);  /* Return to INITIAL state after recognizing a valid character */
-}
- /* If a single quote is encountered inside CHAR_CONST without a preceding character, it's an error */
-<CHAR_CONST>"'"  {
-    fprintf(stderr, "Error: Empty character constant at line %d\n", yylineno);
     BEGIN(INITIAL);
 }
- /* Handle end-of-file (EOF) if still in CHAR_CONST state */
-<CHAR_CONST><<EOF>>  {
-    fprintf(stderr, "Error: Unterminated character constant at line %d\n", yylineno);
+<SINGLE_QUOTE>[^'\n]{2,}'  {
+    printf("Error: Empty character constant at line %d\n", yylineno)  ;
+    BEGIN(INITIAL);
+}
+<SINGLE_QUOTE><<EOF>>  {
+    printf("Error: Unterminated character constant at line %d\n", yylineno);
     BEGIN(INITIAL);
 }
 
  /* M: removal of multi-line comments using start conditions*/
-<INITIAL>"/*" BEGIN(COMMENT);
-<COMMENT>"*/" BEGIN(INITIAL);
-<COMMENT>.  ;
-<COMMENT>\n  ;
-
- /* N: detection of comment end sequence without the beginning sequence using start conditions*/
-<INITIAL>"*/"  {
-    fprintf(stderr, "Error: Comment closing sequence '*/' found without matching opening sequence at line %d\n", yylineno);
-}
-
- /* O: detection of failure to close a comment with indications of the line where the comment begins*/
-<INITIAL>"/*"  {
+<INITIAL>"(*"  {
     BEGIN(COMMENT);
     comment_start_line = yylineno;
 }
+<COMMENT>.  ;
+<COMMENT>\n  ;
+<COMMENT>"*)" BEGIN(INITIAL);
 
-<COMMENT>"*/" BEGIN(INITIAL);
-<COMMENT>.  ;  /* Ignore all other characters in COMMENT state */
-<COMMENT>\n ;  /* Ignore new lines in COMMENT state */
+ /* N: detection of comment end sequence without the beginning sequence using start conditions*/
+<INITIAL>"*)" printf("Comment closed in line %d when none opened\n", yylineno);
+
+ /* O: detection of failure to close a comment with indications of the line where the comment begins*/
+
 <COMMENT><<EOF>>  {
-    fprintf(stderr, "Error: Unclosed multi-line comment starting at line %d\n", comment_start_line);
-    BEGIN(INITIAL);  /* Reset to INITIAL state */
+    printf("Comment opened in line %d not closed\n", comment_start_line);
+    yyterminate();
 }
 
 
