@@ -42,23 +42,36 @@
     (PROGRAM_MODULE) */
 GRAMMAR: { yyerror( "Empty input source is not valid!" ); YYERROR; }
 	| error
-	  /* start here */
+	| PROGRAM_MODULE
 ;
 
 /* PROGRAM_MODULE */
 /* Consists of a keyword MODULE, followed by an identifier (IDENT),
    semicolon, import declaractions (IMPORTS), block (BLOCK),
    identifier and a dot (fullstop, period) */
+PROGRAM_MODULE:
+      KW_MODULE IDENT ';' IMPORTS BLOCK IDENT '.' 
+      { found("PROGRAM_MODULE", $2); }
+;
 
 /* IMPORTS */
 /* A possibly empty sequence of imports (IMPORT) */
+IMPORTS: /* empty */
+       | IMPORT IMPORTS
+;
 
 /* IMPORT */
 /* Keyword FROM, followed by identifier, keyword IMPORT,
  list of identifiers, and a semicolon */
+IMPORT: KW_IMPORT IDENT ';' 
+      { found("IMPORT", $2); }
+;
 
 /* IDENT_LIST */
 /* List of identifiers separated with commas */
+IDENT_LIST: IDENT
+          | IDENT ',' IDENT_LIST
+;
 
 /* BLOCK */
 /* Can either be a sequence:
@@ -66,33 +79,60 @@ GRAMMAR: { yyerror( "Empty input source is not valid!" ); YYERROR; }
    and keyword END,
    or a sequence:
    declarations, and keyword END*/
+BLOCK: DECLARATIONS KW_BEGIN STATEMENTS KW_END
+     | DECLARATIONS KW_END
+;
 
 /* DECLARATIONS */
 /* Possibly empty sequence of declarations (DECLARATION) */
+DECLARATIONS: /* empty */
+            | DECLARATION DECLARATIONS
+;
 
 /* DECLARATION */
 /* Declaration is either keyword CONST, followed by declarations of constants
   (CONST_DECLS),
   or a keyword VAR, followed by declaration of variables (VAR_DECLS),
   or a procedure declaration (PROC_DECL) with a semicolon */
+DECLARATION: KW_CONST CONST_DECLS
+           | KW_VAR VAR_DECLS
+           | PROC_DECL
+;
 
 /* CONST_DECLS */
 /* Possibly empty sequence of declarations of constants (CONST_DECL), each
    followed by a semicolon */
+CONST_DECLS: /* empty */
+           | CONST_DECL ';' CONST_DECLS
+;
 
 /* CONST_DECL */
 /* Identifier, fololowed by equal sign and a constant factor (CONST_FACTOR) */
+CONST_DECL: IDENT '=' CONST_FACTOR 
+          { found("CONST_DECL", $1); }
+;
 
 /* CONST_FACTOR */
 /* Either identifier, integer constant, real constant or string */
+CONST_FACTOR: IDENT
+            | INTEGER_CONST
+            | REAL_CONST
+            | STRING_CONST
+;
 
 /* VAR_DECLS */
 /* Possibly empty sequence of declarations of variables (VAR_DECL), each
    followed by a semicolon */
+VAR_DECLS: /* empty */
+         | VAR_DECL ';' VAR_DECLS
+;
 
 /* VAR_DECL */
 /* List of identifiers (IDENT_LIST), followed by a colon, and type specification
    (TYPE_SPEC) */
+VAR_DECL: IDENT_LIST ':' TYPE_SPEC 
+        { found("VAR_DECL", ""); }
+;
 
 /* TYPE_SPEC */
 /* One of tyhe following:
@@ -101,55 +141,95 @@ GRAMMAR: { yyerror( "Empty input source is not valid!" ); YYERROR; }
      and type specification (TYPE_SPEC)
    - keyword RECORD, fields (FIELDS), keyword END
 */
+TYPE_SPEC: IDENT
+         | KW_ARRAY DIMEN_SPECS KW_OF TYPE_SPEC
+         | KW_RECORD FIELDS KW_END
+;
 
 /* DIMEN_SPECS */
  /* nonempty list of dimension specifications (DIMEN_SPEC)
     separated with commas */
+DIMEN_SPECS: DIMEN_SPEC
+           | DIMEN_SPEC ',' DIMEN_SPECS
+;
 
 /* DIMEN_SPEC */
 /* left square bracket, constant factor (CONST_FACTOR), range operator,
    constant factor, right square  bracket */
+DIMEN_SPEC: '[' CONST_FACTOR RANGE CONST_FACTOR ']'
+;
 
 /* FIELDS */
 /* Possibly empty sequence of fields (FIELD), followed each by a semicolon */
+FIELDS: /* empty */ 
+      | FIELD ';' FIELDS
+;
 
 /* FIELD */
 /* Identifier list (IDENT_LIST), followed by a colon, and type specification
    (TYPE_SPEC) */
+FIELD: IDENT_LIST ':' TYPE_SPEC
+;
 
 /* PROC_DECL */
 /* Procedure header, semicolon, block, and identifier */
+PROC_DECL: PROC_HEAD ';' BLOCK IDENT
+         { found("PROC_DECL", ""); }
+;
 
 /* PROC_HEAD */
 /* keyword PROCEDURE (KW_PROCEDURE), identifier (IDENT),
    optional formal parameters (OPT_FORMAL_PARAMS) */
+PROC_HEAD: KW_PROCEDURE IDENT OPT_FORMAL_PARAMS
+;
 
 /* OPT_FORMAL_PARAMS */
 /* empty or formal parameters (FORMAL_PARAMS) */
+OPT_FORMAL_PARAMS: /* empty */ 
+                 | FORMAL_PARAMS
+;
 
 /* FORMAL_PARAMS */
 /* left parenthesis, formal parameter sections (FP_SECTIONS),
    right parenthesis, optional return type (OPT_RET_TYPE) */
+FORMAL_PARAMS: '(' FP_SECTIONS ')' OPT_RET_TYPE
+;
 
 /* FP_SECTIONS */
 /* nonempty list of formal parameter sections (FP_SECTION) separated with
    semicolons */
+FP_SECTIONS: FP_SECTION ',' FP_SECTIONS
+;
 
 /* FP_SECTION */
 /* optional keyword VAR (OPT_VAR), identifier list (IDENT_LIST),
    colon, and qualified indentifier (QUALIDENT) */
+FP_SECTION: OPT_VAR IDENT_LIST ':' QUALIDENT
+;
 
 /* OPT_VAR */
 /* empty or keyword VAR (KW_VAR) */
+OPT_VAR: /* empty */
+       | KW_VAR
+;
 
 /* OPT_RET_TYPE */
 /* empty or colon and qualified identifier (QUALIDENT) */
+OPT_RET_TYPE: /* empty */
+            | ':' QUALIDENT
+;
 
 /* QUALIDENT */
 /* nonempty identifier list separated with dots */
+QUALIDENT: IDENT
+         | QUALIDENT '.' IDENT
+;
 
 /* STATEMENTS */
 /* List of statements (STATEMENT) separated with semicolons */
+STATEMENTS: STATEMENT
+          | STATEMENTS ';' STATEMENT
+;
 
 /* STATEMENT */
 /* Either a procedure call (PROCEDURE_CALL),
