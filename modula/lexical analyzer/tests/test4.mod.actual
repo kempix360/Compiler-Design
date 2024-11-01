@@ -172,11 +172,11 @@ WriteLn             IDENT           WriteLn
 "Aha!"              STRING_CONST    "Aha!"
 )                   )               
 |                   |               
-Error: Empty character constant at line 45
+Single quote opened in line 45 not closed
 a                   IDENT           a
 : Writeln("Yes?") (* missing second single quote *)
   ELSE (* This comment is unfinished
        Writeln("O!")
   END
 END test.
-Error: Unterminated character constant at line 45
+Unterminated single quote in line 45

@@ -106,7 +106,7 @@ WriteString         IDENT           WriteString
 ELSE                KW_ELSE         
 WriteString         IDENT           WriteString
 (                   (               
-Error: Unterminated string constant at line 31
+Unterminated double quote in line 31
 END                 KW_END          
 ;                   ;               
 WriteLn             IDENT           WriteLn

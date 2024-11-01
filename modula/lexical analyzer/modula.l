@@ -12,8 +12,8 @@ int comment_close_line;
 int comment_start_line;
 %}
 
- /* stany analizatora leksykalnego (INITIAL jest zdefiniowany) */
 %option yylineno
+ /* stany analizatora leksykalnego (INITIAL jest zdefiniowany) */
 %x DOUBLE_QUOTE
 %x SINGLE_QUOTE
 %x COMMENT
@@ -81,7 +81,7 @@ DOWNTO  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
 \'[^\'\n]\' return process_token(yytext, "CHAR_CONST", yytext, CHAR_CONST);
 
  /* J: detecting single-character ending symbols: operators, punctuation*/
-[+\-*/=()\[\],.;<>|:{}]  return process_token(yytext, yytext, "", yytext[0]);
+[+\-*/=()\[\],.;<|:]  return process_token(yytext, yytext, "", yytext[0]);
 
  /* K: detecting strings in quotes using initial conditions*/
 <INITIAL>\" BEGIN(DOUBLE_QUOTE);
@@ -91,26 +91,26 @@ DOWNTO  return process_token(yytext, "KW_DOWNTO", "", KW_DOWNTO);
     BEGIN(INITIAL);
 }
 <DOUBLE_QUOTE>\n  {
-    printf("Error: Unterminated string constant at line %d\n", yylineno);
+    printf("Unterminated double quote in line %d\n", yylineno);
     BEGIN(INITIAL);
 }
 <DOUBLE_QUOTE><<EOF>>  {
-    printf("Error: Unterminated string constant at line %d\n", yylineno);
+    printf("Unterminated double quote in line %d\n", yylineno);
     yyterminate();
 }
 
  /* L: recognition of character constants in apostrophes using start conditions*/
-<INITIAL>'  BEGIN(SINGLE_QUOTE);
-<SINGLE_QUOTE>[^'\n]'  {
+<INITIAL>\'  BEGIN(SINGLE_QUOTE);
+<SINGLE_QUOTE>[^\'\n]\'  {
     return process_token(yytext, "CHAR_CONST", yytext, CHAR_CONST);
     BEGIN(INITIAL);
 }
-<SINGLE_QUOTE>[^'\n]{2,}'  {
-    printf("Error: Empty character constant at line %d\n", yylineno)  ;
+<SINGLE_QUOTE>[^\'\n]{2,}\'  {
+    printf("Single quote opened in line %d not closed\n", yylineno)  ;
     BEGIN(INITIAL);
 }
 <SINGLE_QUOTE><<EOF>>  {
-    printf("Error: Unterminated character constant at line %d\n", yylineno);
+    printf("Unterminated single quote in line %d\n", yylineno);
     BEGIN(INITIAL);
 }
 

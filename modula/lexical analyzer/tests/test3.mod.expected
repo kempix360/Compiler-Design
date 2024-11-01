@@ -1,5 +1,5 @@
 First and Family Name
-yytext              Token Type         Token value as string
+yytext              Token type         Token value as string
 
 MODULE              KW_MODULE       
 test                IDENT           test
@@ -106,4 +106,78 @@ WriteString         IDENT           WriteString
 ELSE                KW_ELSE         
 WriteString         IDENT           WriteString
 (                   (               
-Double quotes opened in line 30 not closed
+Unterminated double quote in line 31
+END                 KW_END          
+;                   ;               
+WriteLn             IDENT           WriteLn
+;                   ;               
+i                   IDENT           i
+:=                  ASSIGN          
+1                   INTEGER_CONST   1
+;                   ;               
+WHILE               KW_WHILE        
+i                   IDENT           i
+<                   <               
+5                   INTEGER_CONST   5
+DO                  KW_DO           
+WriteLn             IDENT           WriteLn
+(                   (               
+i                   IDENT           i
+)                   )               
+;                   ;               
+i                   IDENT           i
+:=                  ASSIGN          
+i                   IDENT           i
++                   +               
+1                   INTEGER_CONST   1
+END                 KW_END          
+;                   ;               
+REPEAT              KW_REPEAT       
+WriteLn             IDENT           WriteLn
+(                   (               
+i                   IDENT           i
+)                   )               
+;                   ;               
+i                   IDENT           i
+:=                  ASSIGN          
+i                   IDENT           i
+-                   -               
+1                   INTEGER_CONST   1
+UNTIL               KW_UNTIL        
+i                   IDENT           i
+=                   =               
+1                   INTEGER_CONST   1
+;                   ;               
+LOOP                KW_LOOP         
+Comment closed in line 40 when none opened
+WriteLn             IDENT           WriteLn
+(                   (               
+"Spam"              STRING_CONST    "Spam"
+)                   )               
+END                 KW_END          
+;                   ;               
+CASE                KW_CASE         
+CHR                 IDENT           CHR
+(                   (               
+FromAscii           IDENT           FromAscii
++                   +               
+16                  INTEGER_CONST   16
+)                   )               
+OF                  KW_OF           
+'0'                 CHAR_CONST      '0'
+:                   :               
+WriteLn             IDENT           WriteLn
+(                   (               
+"Aha!"              STRING_CONST    "Aha!"
+)                   )               
+|                   |               
+'A'                 CHAR_CONST      'A'
+,                   ,               
+'a'                 CHAR_CONST      'a'
+:                   :               
+Writeln             IDENT           Writeln
+(                   (               
+"Yes?"              STRING_CONST    "Yes?"
+)                   )               
+ELSE                KW_ELSE         
+Comment opened in line 46 not closed
