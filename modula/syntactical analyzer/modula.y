@@ -49,9 +49,7 @@ GRAMMAR: { yyerror( "Empty input source is not valid!" ); YYERROR; }
 /* Consists of a keyword MODULE, followed by an identifier (IDENT),
    semicolon, import declaractions (IMPORTS), block (BLOCK),
    identifier and a dot (fullstop, period) */
-PROGRAM_MODULE:
-      KW_MODULE IDENT ';' IMPORTS BLOCK IDENT '.' 
-      { found("PROGRAM_MODULE", $2); }
+PROGRAM_MODULE: KW_MODULE IDENT ';' IMPORTS BLOCK IDENT '.' { found("PROGRAM_MODULE", $2); }
 ;
 
 /* IMPORTS */
@@ -241,34 +239,68 @@ STATEMENTS: STATEMENT
  or infinite loop (LOOP_STATEMENT),
  or case statement (CASE_STATEMENT)
 */
+STATEMENT: PROCEDURE_CALL
+         | ASSIGNMENT
+         | FOR_STATEMENT
+         | IF_STATEMENT
+         | WHILE_STATEMENT
+         | REPEAT_STATEMENT
+         | LOOP_STATEMENT
+         | CASE_STATEMENT
+;
 
 /* ASSIGNMENT */
 /* Identifier, qualifier, assignment operator (ASSIGN), and expression (EXPR) */
+ASSIGNMENT: IDENT QUALIF ASSIGN EXPR { found("ASSIGNMENT", yytext); }
+;
 
 /* QUALIF */
 /* can either be empty,
    or a left square bracket, indexes (SUBSCRIPTS), right square  bracket,
       and qualifier,
    or a dot, identifier, and qualifier */
+QUALIF: /* empty */
+      | '[' SUBSCRIPTS ']' QUALIF { found("QUALIF", yytext); }
+      | '.' IDENT QUALIF { found("QUALIF", yytext); }
+;
 
 /* SUBSCRIPTS */
  /* nonepmty expression list separated with commas */
+SUBSCRIPTS: EXPR { found("SUBSCRIPT", yytext); }
+          | SUBSCRIPTS ',' EXPR { found("SUBSCRIPT", yytext); }
 
 /* PROCEDURE_CALL */
 /* Either only identifier,
  or identifier, left parenthesis, actual parameters (ACT_PARAMETERS),
  and right parenthesis */
+PROCEDURE_CALL: IDENT
+              | IDENT '(' ACT_PARAMETERS ')'
+;
 
 /* ACT_PARAMETERS */
 /* List of expressions (EXPR) separated with commas */
+ACT_PARAMETERS: EXPR
+              | ACT_PARAMETERS ',' EXPR { found("ACT_PARAMETERS", ""); }
+;
 
 /* EXPR */
 /* Either a simple expression (SIMPLE_EXPR),
    or two simple expressions separated with a relational operator (REL_OP) */
+EXPR: SIMPLE_EXPR
+    | SIMPLE_EXPR REL_OP SIMPLE_EXPR
+;
 
 /* REL_OP */
 /* Either equal sign, less, greater, hash, not equal (NEQ),
    less or equal (LE), greater or equal (GE), or keyword IN */
+REL_OP: '='
+      | '<'
+      | '>'
+      | NEQ
+      | LE
+      | GE
+      | KW_IN
+;
 
 /* SIMPLE_EXPR */
 /* Either a factor (FACTOR),
@@ -281,6 +313,25 @@ STATEMENTS: STATEMENT
    - conjunction (KW_AND),
    - interger division (KW_DIV),
    - or modulo (KW_MOD) */
+SIMPLE_EXPR: FACTOR 
+            | SIMPLE_EXPR '+' SIMPLE_EXPR 
+            { found("SIMPLE_EXPR", "+"); }
+            | SIMPLE_EXPR '-' SIMPLE_EXPR 
+            { found("SIMPLE_EXPR", "-"); }
+            | SIMPLE_EXPR KW_OR SIMPLE_EXPR 
+            { found("SIMPLE_EXPR", "KW_OR"); }
+            | SIMPLE_EXPR '*' SIMPLE_EXPR 
+            { found("SIMPLE_EXPR", "*"); }
+            | SIMPLE_EXPR '/' SIMPLE_EXPR 
+            { found("SIMPLE_EXPR", "/"); }
+            | SIMPLE_EXPR KW_AND SIMPLE_EXPR 
+            { found("SIMPLE_EXPR", "KW_AND"); }
+            | SIMPLE_EXPR KW_DIV SIMPLE_EXPR 
+            { found("SIMPLE_EXPR", "KW_DIV"); }
+            | SIMPLE_EXPR KW_MOD SIMPLE_EXPR 
+            { found("SIMPLE_EXPR", "KW_MOD"); }
+;
+
 
 /* FACTOR */
 /* Either interger constant, real constant, string constant,
@@ -289,51 +340,83 @@ STATEMENTS: STATEMENT
    procedure call, expression in parentheses,
    or a factor following either keyword NOT, or a unary minus
    (with NEG precedence) */
+FACTOR: INTEGER_CONST { found("FACTOR", $1); } 
+      | REAL_CONST { found("FACTOR", $1); } 
+      | STRING_CONST { found("FACTOR", $1); } 
+      | CHAR_CONST { found("FACTOR", $1); } 
+      | QUALIDENT { found("FACTOR", $1); } 
+      | PROCEDURE_CALL { found("FACTOR", "PROCEDURE_CALL"); } 
+      | '(' EXPR ')' { found("FACTOR", "expression"); } 
+      | KW_NOT FACTOR { found("FACTOR", "KW_NOT"); } 
+      | '-' FACTOR { found("FACTOR", "unary -"); } 
+;
 
 /* FOR_STATEMENT */
  /* Sequence: keyword FOR, identifier, assignment operator (ASSIGN),
     expression, TO or DOWNTO (TO_DOWNTO), expression, keyword DO,
    statements (STATEMENTS), and keyword END */
+FOR_STATEMENT: KW_FOR IDENT ASSIGN EXPR TO_DOWNTO EXPR KW_DO STATEMENTS KW_END { found("FOR_STATEMENT", $1); } 
+;
 
 /* TO_DOWNTO */
  /* Either keyword TO, or keyword DOWNTO */
+TO_DOWNTO: KW_TO { found("TO_DOWNTO", $1); } 
+         | KW_DOWNTO { found("TO_DOWNTO", $1); } 
+;
 
 /* IF_STATEMENT */
 /* Sequence: keyword IF, expression,
    keyword THEN, statements (STATEMENTS),  ELSIF part (ELSIFS),
    ELSE part (ELSE_PART), and keyword END */
+IF_STATEMENT: KW_IF EXPR KW_THEN STATEMENTS ELSIFS ELSE_PART KW_END { found("IF_STATEMENT", $1); } 
 
 /* ELSIFS */
 /* Possibly empty sequence of sequences of the form:
    keyword ELSIF, expression, keyword THEN, and statements */
+ELSIFS: /* empty */
+      | KW_ELSIF EXPR KW_THEN STATEMENTS { found("ELSIFS", "ELSIFS"); } 
 
 /* ELSE_PART */
 /* Either empty or keyword ELSE followed by statements */
+ELSE_PART: /* empty */
+         | KW_ELSE STATEMENTS { found("ELSE_PART", "ELSE_PART"); }
 
 /* WHILE_STATEMENT */
 /* keyword WHILE (KW_WHILE), expression (EXPR), keyword DO (KW_DO),
    statements (STATEMENTS), and keyword END (KW_END) */
+WHILE_STATEMENT: KW_WHILE EXPR KW_DO STATEMENTS KW_END { found("WHILE_STATEMENT", $1); }
 
 /* REPEAT_STATEMENT */
 /* keyword REPEAT (KW_REPEAT), statements (STATEMENTS),
    keyword UNTIL (KW_UNTIL), and expression (EXPR) */
+REPEAT_STATEMENT: KW_REPEAT STATEMENTS KW_UNTIL EXPR { found("REPEAT_STATEMENT", $1); }
 
 /* LOOP_STATEMENT */
 /* keyword LOOP (KW_LOOP), statements (STATEMENTS), and keyword end (KW_END) */
+LOOP_STATEMENT: KW_LOOP STATEMENTS KW_END { found("LOOP_STATEMENT", $1); }
 
 /* CASE_STATEMENT */
 /* keyword CASE (KW_CASE), expression (EXPR), keyword OF,
    cases (CASES), ELSE part (ELSE_PART), and keyword END */
+CASE_STATEMENT: KW_CASE EXPR KW_OF CASES ELSE_PART KW_END { found("CASE_STATEMENT", $1); }
 
 /* CASES */
 /* lists of 3 items: CASE labels (CASE_LABELS), colon,
    and statements (STATEMENTS), every 3 items separated with vertical bars */
+CASES: CASE_LABELS '|' ':' '|' STATEMENTS '|'
+;
 
 /* CASE_LABELS */
 /* list of CASE_LABEL separated with commas */
+CASE_LABELS: CASE_LABEL
+           | CASE_LABELS ',' CASE_LABEL
+;
 
 /* CASE_LABEL */
 /* Either an integer constant, or a character constant */
+CASE_LABEL: INTEGER_CONST
+          | CHAR_CONST
+;
 
 %%
 
