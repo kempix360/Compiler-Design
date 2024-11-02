@@ -54,7 +54,7 @@ PROGRAM_MODULE: KW_MODULE IDENT ';' IMPORTS BLOCK IDENT '.' { found("PROGRAM_MOD
 
 /* IMPORTS */
 /* A possibly empty sequence of imports (IMPORT) */
-IMPORTS: /* empty */
+IMPORTS: %empty
        | IMPORTS IMPORT
 ;
 
@@ -82,7 +82,7 @@ BLOCK: DECLARATIONS KW_BEGIN STATEMENTS KW_END
 
 /* DECLARATIONS */
 /* Possibly empty sequence of declarations (DECLARATION) */
-DECLARATIONS: /* empty */
+DECLARATIONS: %empty
             | DECLARATIONS DECLARATION
 ;
 
@@ -99,14 +99,13 @@ DECLARATION: KW_CONST CONST_DECLS
 /* CONST_DECLS */
 /* Possibly empty sequence of declarations of constants (CONST_DECL), each
    followed by a semicolon */
-CONST_DECLS: /* empty */
-           | CONST_DECLS ';' CONST_DECL
+CONST_DECLS: %empty
+           | CONST_DECLS CONST_DECL ';'
 ;
 
 /* CONST_DECL */
-/* Identifier, fololowed by equal sign and a constant factor (CONST_FACTOR) */
-CONST_DECL: IDENT '=' CONST_FACTOR 
-          { found("CONST_DECL", $1); }
+/* Identifier, followed by equal sign and a constant factor (CONST_FACTOR) */
+CONST_DECL: IDENT '=' CONST_FACTOR { found("CONST_DECL", $1); }
 ;
 
 /* CONST_FACTOR */
@@ -120,7 +119,7 @@ CONST_FACTOR: IDENT
 /* VAR_DECLS */
 /* Possibly empty sequence of declarations of variables (VAR_DECL), each
    followed by a semicolon */
-VAR_DECLS: /* empty */
+VAR_DECLS: %empty
          | VAR_DECLS VAR_DECL ';'
 ;
 
@@ -157,7 +156,7 @@ DIMEN_SPEC: '[' CONST_FACTOR RANGE CONST_FACTOR ']'
 
 /* FIELDS */
 /* Possibly empty sequence of fields (FIELD), followed each by a semicolon */
-FIELDS: /* empty */ 
+FIELDS: %empty 
       | FIELDS FIELD ';'
 ;
 
@@ -180,7 +179,7 @@ PROC_HEAD: KW_PROCEDURE IDENT OPT_FORMAL_PARAMS { found("PROC_HEAD", $2); }
 
 /* OPT_FORMAL_PARAMS */
 /* empty or formal parameters (FORMAL_PARAMS) */
-OPT_FORMAL_PARAMS: /* empty */ 
+OPT_FORMAL_PARAMS: %empty 
                  | FORMAL_PARAMS
 ;
 
@@ -205,13 +204,13 @@ FP_SECTION: OPT_VAR IDENT_LIST ':' QUALIDENT { found("FP_SECTION", ""); }
 
 /* OPT_VAR */
 /* empty or keyword VAR (KW_VAR) */
-OPT_VAR: /* empty */
+OPT_VAR: %empty
        | KW_VAR
 ;
 
 /* OPT_RET_TYPE */
 /* empty or colon and qualified identifier (QUALIDENT) */
-OPT_RET_TYPE: /* empty */
+OPT_RET_TYPE: %empty
             | ':' QUALIDENT
 ;
 
@@ -257,7 +256,7 @@ ASSIGNMENT: IDENT QUALIF ASSIGN EXPR { found("ASSIGNMENT", $1); }
    or a left square bracket, indexes (SUBSCRIPTS), right square  bracket,
       and qualifier,
    or a dot, identifier, and qualifier */
-QUALIF: /* empty */
+QUALIF: %empty
       | '[' SUBSCRIPTS ']' QUALIF
       | '.' IDENT QUALIF
 ;
@@ -364,13 +363,13 @@ IF_STATEMENT: KW_IF EXPR KW_THEN STATEMENTS ELSIFS ELSE_PART KW_END { found("IF_
 /* ELSIFS */
 /* Possibly empty sequence of sequences of the form:
    keyword ELSIF, expression, keyword THEN, and statements */
-ELSIFS: /* empty */
+ELSIFS: %empty
       | ELSIFS KW_ELSIF EXPR KW_THEN STATEMENTS
 ;
 
 /* ELSE_PART */
 /* Either empty or keyword ELSE followed by statements */
-ELSE_PART: /* empty */
+ELSE_PART: %empty
          | KW_ELSE STATEMENTS
 ;
 
