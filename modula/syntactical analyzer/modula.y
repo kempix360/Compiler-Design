@@ -55,20 +55,19 @@ PROGRAM_MODULE: KW_MODULE IDENT ';' IMPORTS BLOCK IDENT '.' { found("PROGRAM_MOD
 /* IMPORTS */
 /* A possibly empty sequence of imports (IMPORT) */
 IMPORTS: /* empty */
-       | IMPORT IMPORTS
+       | IMPORTS IMPORT
 ;
 
 /* IMPORT */
 /* Keyword FROM, followed by identifier, keyword IMPORT,
  list of identifiers, and a semicolon */
-IMPORT: KW_IMPORT IDENT ';' 
-      { found("IMPORT", $2); }
+IMPORT: KW_FROM IDENT KW_IMPORT IDENT_LIST ';' { found("IMPORT", $2); }
 ;
 
 /* IDENT_LIST */
 /* List of identifiers separated with commas */
 IDENT_LIST: IDENT
-          | IDENT ',' IDENT_LIST
+          | IDENT_LIST ',' IDENT
 ;
 
 /* BLOCK */
@@ -84,7 +83,7 @@ BLOCK: DECLARATIONS KW_BEGIN STATEMENTS KW_END
 /* DECLARATIONS */
 /* Possibly empty sequence of declarations (DECLARATION) */
 DECLARATIONS: /* empty */
-            | DECLARATION DECLARATIONS
+            | DECLARATIONS DECLARATION
 ;
 
 /* DECLARATION */
@@ -94,14 +93,14 @@ DECLARATIONS: /* empty */
   or a procedure declaration (PROC_DECL) with a semicolon */
 DECLARATION: KW_CONST CONST_DECLS
            | KW_VAR VAR_DECLS
-           | PROC_DECL
+           | PROC_DECL ';'
 ;
 
 /* CONST_DECLS */
 /* Possibly empty sequence of declarations of constants (CONST_DECL), each
    followed by a semicolon */
 CONST_DECLS: /* empty */
-           | CONST_DECL ';' CONST_DECLS
+           | CONST_DECLS ';' CONST_DECL
 ;
 
 /* CONST_DECL */
@@ -122,14 +121,13 @@ CONST_FACTOR: IDENT
 /* Possibly empty sequence of declarations of variables (VAR_DECL), each
    followed by a semicolon */
 VAR_DECLS: /* empty */
-         | VAR_DECL ';' VAR_DECLS
+         | VAR_DECLS VAR_DECL ';'
 ;
 
 /* VAR_DECL */
 /* List of identifiers (IDENT_LIST), followed by a colon, and type specification
    (TYPE_SPEC) */
-VAR_DECL: IDENT_LIST ':' TYPE_SPEC 
-        { found("VAR_DECL", ""); }
+VAR_DECL: IDENT_LIST ':' TYPE_SPEC { found("VAR_DECL", ""); }
 ;
 
 /* TYPE_SPEC */
@@ -148,7 +146,7 @@ TYPE_SPEC: IDENT
  /* nonempty list of dimension specifications (DIMEN_SPEC)
     separated with commas */
 DIMEN_SPECS: DIMEN_SPEC
-           | DIMEN_SPEC ',' DIMEN_SPECS
+           | DIMEN_SPECS ',' DIMEN_SPEC
 ;
 
 /* DIMEN_SPEC */
@@ -160,7 +158,7 @@ DIMEN_SPEC: '[' CONST_FACTOR RANGE CONST_FACTOR ']'
 /* FIELDS */
 /* Possibly empty sequence of fields (FIELD), followed each by a semicolon */
 FIELDS: /* empty */ 
-      | FIELD ';' FIELDS
+      | FIELDS FIELD ';'
 ;
 
 /* FIELD */
@@ -171,14 +169,13 @@ FIELD: IDENT_LIST ':' TYPE_SPEC
 
 /* PROC_DECL */
 /* Procedure header, semicolon, block, and identifier */
-PROC_DECL: PROC_HEAD ';' BLOCK IDENT
-         { found("PROC_DECL", ""); }
+PROC_DECL: PROC_HEAD ';' BLOCK IDENT { found("PROC_DECL", ""); }
 ;
 
 /* PROC_HEAD */
 /* keyword PROCEDURE (KW_PROCEDURE), identifier (IDENT),
    optional formal parameters (OPT_FORMAL_PARAMS) */
-PROC_HEAD: KW_PROCEDURE IDENT OPT_FORMAL_PARAMS
+PROC_HEAD: KW_PROCEDURE IDENT OPT_FORMAL_PARAMS { found("PROC_HEAD", $2); }
 ;
 
 /* OPT_FORMAL_PARAMS */
@@ -196,13 +193,14 @@ FORMAL_PARAMS: '(' FP_SECTIONS ')' OPT_RET_TYPE
 /* FP_SECTIONS */
 /* nonempty list of formal parameter sections (FP_SECTION) separated with
    semicolons */
-FP_SECTIONS: FP_SECTION ',' FP_SECTIONS
+FP_SECTIONS: FP_SECTION
+           | FP_SECTIONS ';' FP_SECTION
 ;
 
 /* FP_SECTION */
 /* optional keyword VAR (OPT_VAR), identifier list (IDENT_LIST),
    colon, and qualified indentifier (QUALIDENT) */
-FP_SECTION: OPT_VAR IDENT_LIST ':' QUALIDENT
+FP_SECTION: OPT_VAR IDENT_LIST ':' QUALIDENT { found("FP_SECTION", ""); }
 ;
 
 /* OPT_VAR */
@@ -251,7 +249,7 @@ STATEMENT: PROCEDURE_CALL
 
 /* ASSIGNMENT */
 /* Identifier, qualifier, assignment operator (ASSIGN), and expression (EXPR) */
-ASSIGNMENT: IDENT QUALIF ASSIGN EXPR { found("ASSIGNMENT", yytext); }
+ASSIGNMENT: IDENT QUALIF ASSIGN EXPR { found("ASSIGNMENT", $1); }
 ;
 
 /* QUALIF */
@@ -260,27 +258,27 @@ ASSIGNMENT: IDENT QUALIF ASSIGN EXPR { found("ASSIGNMENT", yytext); }
       and qualifier,
    or a dot, identifier, and qualifier */
 QUALIF: /* empty */
-      | '[' SUBSCRIPTS ']' QUALIF { found("QUALIF", yytext); }
-      | '.' IDENT QUALIF { found("QUALIF", yytext); }
+      | '[' SUBSCRIPTS ']' QUALIF
+      | '.' IDENT QUALIF
 ;
 
 /* SUBSCRIPTS */
  /* nonepmty expression list separated with commas */
-SUBSCRIPTS: EXPR { found("SUBSCRIPT", yytext); }
-          | SUBSCRIPTS ',' EXPR { found("SUBSCRIPT", yytext); }
+SUBSCRIPTS: EXPR
+          | SUBSCRIPTS ',' EXPR
 
 /* PROCEDURE_CALL */
 /* Either only identifier,
  or identifier, left parenthesis, actual parameters (ACT_PARAMETERS),
  and right parenthesis */
-PROCEDURE_CALL: IDENT
-              | IDENT '(' ACT_PARAMETERS ')'
+PROCEDURE_CALL: IDENT { found("PROCEDURE_CALL", $1); }
+              | IDENT '(' ACT_PARAMETERS ')' { found("PROCEDURE_CALL", $1); }
 ;
 
 /* ACT_PARAMETERS */
 /* List of expressions (EXPR) separated with commas */
 ACT_PARAMETERS: EXPR
-              | ACT_PARAMETERS ',' EXPR { found("ACT_PARAMETERS", ""); }
+              | ACT_PARAMETERS ',' EXPR
 ;
 
 /* EXPR */
@@ -314,22 +312,14 @@ REL_OP: '='
    - interger division (KW_DIV),
    - or modulo (KW_MOD) */
 SIMPLE_EXPR: FACTOR 
-            | SIMPLE_EXPR '+' SIMPLE_EXPR 
-            { found("SIMPLE_EXPR", "+"); }
-            | SIMPLE_EXPR '-' SIMPLE_EXPR 
-            { found("SIMPLE_EXPR", "-"); }
-            | SIMPLE_EXPR KW_OR SIMPLE_EXPR 
-            { found("SIMPLE_EXPR", "KW_OR"); }
-            | SIMPLE_EXPR '*' SIMPLE_EXPR 
-            { found("SIMPLE_EXPR", "*"); }
-            | SIMPLE_EXPR '/' SIMPLE_EXPR 
-            { found("SIMPLE_EXPR", "/"); }
-            | SIMPLE_EXPR KW_AND SIMPLE_EXPR 
-            { found("SIMPLE_EXPR", "KW_AND"); }
-            | SIMPLE_EXPR KW_DIV SIMPLE_EXPR 
-            { found("SIMPLE_EXPR", "KW_DIV"); }
-            | SIMPLE_EXPR KW_MOD SIMPLE_EXPR 
-            { found("SIMPLE_EXPR", "KW_MOD"); }
+           | SIMPLE_EXPR '+' SIMPLE_EXPR 
+           | SIMPLE_EXPR '-' SIMPLE_EXPR 
+           | SIMPLE_EXPR KW_OR SIMPLE_EXPR 
+           | SIMPLE_EXPR '*' SIMPLE_EXPR 
+           | SIMPLE_EXPR '/' SIMPLE_EXPR 
+           | SIMPLE_EXPR KW_AND SIMPLE_EXPR 
+           | SIMPLE_EXPR KW_DIV SIMPLE_EXPR 
+           | SIMPLE_EXPR KW_MOD SIMPLE_EXPR 
 ;
 
 
@@ -340,15 +330,15 @@ SIMPLE_EXPR: FACTOR
    procedure call, expression in parentheses,
    or a factor following either keyword NOT, or a unary minus
    (with NEG precedence) */
-FACTOR: INTEGER_CONST { found("FACTOR", $1); } 
-      | REAL_CONST { found("FACTOR", $1); } 
-      | STRING_CONST { found("FACTOR", $1); } 
-      | CHAR_CONST { found("FACTOR", $1); } 
-      | QUALIDENT { found("FACTOR", $1); } 
-      | PROCEDURE_CALL { found("FACTOR", "PROCEDURE_CALL"); } 
-      | '(' EXPR ')' { found("FACTOR", "expression"); } 
-      | KW_NOT FACTOR { found("FACTOR", "KW_NOT"); } 
-      | '-' FACTOR { found("FACTOR", "unary -"); } 
+FACTOR: INTEGER_CONST
+      | REAL_CONST
+      | STRING_CONST
+      | CHAR_CONST
+      | QUALIDENT
+      | PROCEDURE_CALL
+      | '(' EXPR ')'
+      | KW_NOT FACTOR
+      | '-' FACTOR
 ;
 
 /* FOR_STATEMENT */
@@ -360,8 +350,8 @@ FOR_STATEMENT: KW_FOR IDENT ASSIGN EXPR TO_DOWNTO EXPR KW_DO STATEMENTS KW_END {
 
 /* TO_DOWNTO */
  /* Either keyword TO, or keyword DOWNTO */
-TO_DOWNTO: KW_TO { found("TO_DOWNTO", $1); } 
-         | KW_DOWNTO { found("TO_DOWNTO", $1); } 
+TO_DOWNTO: KW_TO
+         | KW_DOWNTO
 ;
 
 /* IF_STATEMENT */
@@ -369,41 +359,48 @@ TO_DOWNTO: KW_TO { found("TO_DOWNTO", $1); }
    keyword THEN, statements (STATEMENTS),  ELSIF part (ELSIFS),
    ELSE part (ELSE_PART), and keyword END */
 IF_STATEMENT: KW_IF EXPR KW_THEN STATEMENTS ELSIFS ELSE_PART KW_END { found("IF_STATEMENT", $1); } 
+;
 
 /* ELSIFS */
 /* Possibly empty sequence of sequences of the form:
    keyword ELSIF, expression, keyword THEN, and statements */
 ELSIFS: /* empty */
-      | KW_ELSIF EXPR KW_THEN STATEMENTS { found("ELSIFS", "ELSIFS"); } 
+      | ELSIFS KW_ELSIF EXPR KW_THEN STATEMENTS
+;
 
 /* ELSE_PART */
 /* Either empty or keyword ELSE followed by statements */
 ELSE_PART: /* empty */
-         | KW_ELSE STATEMENTS { found("ELSE_PART", "ELSE_PART"); }
+         | KW_ELSE STATEMENTS
+;
 
 /* WHILE_STATEMENT */
 /* keyword WHILE (KW_WHILE), expression (EXPR), keyword DO (KW_DO),
    statements (STATEMENTS), and keyword END (KW_END) */
 WHILE_STATEMENT: KW_WHILE EXPR KW_DO STATEMENTS KW_END { found("WHILE_STATEMENT", $1); }
+;
 
 /* REPEAT_STATEMENT */
 /* keyword REPEAT (KW_REPEAT), statements (STATEMENTS),
    keyword UNTIL (KW_UNTIL), and expression (EXPR) */
 REPEAT_STATEMENT: KW_REPEAT STATEMENTS KW_UNTIL EXPR { found("REPEAT_STATEMENT", $1); }
+;
 
 /* LOOP_STATEMENT */
 /* keyword LOOP (KW_LOOP), statements (STATEMENTS), and keyword end (KW_END) */
 LOOP_STATEMENT: KW_LOOP STATEMENTS KW_END { found("LOOP_STATEMENT", $1); }
+;
 
 /* CASE_STATEMENT */
 /* keyword CASE (KW_CASE), expression (EXPR), keyword OF,
    cases (CASES), ELSE part (ELSE_PART), and keyword END */
 CASE_STATEMENT: KW_CASE EXPR KW_OF CASES ELSE_PART KW_END { found("CASE_STATEMENT", $1); }
+;
 
 /* CASES */
 /* lists of 3 items: CASE labels (CASE_LABELS), colon,
    and statements (STATEMENTS), every 3 items separated with vertical bars */
-CASES: CASE_LABELS '|' ':' '|' STATEMENTS '|'
+CASES: CASES '|' CASE_LABELS ':' STATEMENTS
 ;
 
 /* CASE_LABELS */
@@ -422,7 +419,7 @@ CASE_LABEL: INTEGER_CONST
 
 int main( void )
 { 
-	printf( "First and last name\n" );
+	printf( "Maksymilian Kempa\n" );
 	printf( "yytext              Token type      Token value as string\n\n" );
 	yyparse();
 	return( 0 ); // OK
