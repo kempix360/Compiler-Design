@@ -262,9 +262,10 @@ QUALIF: %empty
 ;
 
 /* SUBSCRIPTS */
- /* nonepmty expression list separated with commas */
+ /* nonempty expression list separated with commas */
 SUBSCRIPTS: EXPR
           | SUBSCRIPTS ',' EXPR
+;
 
 /* PROCEDURE_CALL */
 /* Either only identifier,
@@ -399,7 +400,8 @@ CASE_STATEMENT: KW_CASE EXPR KW_OF CASES ELSE_PART KW_END { found("CASE_STATEMEN
 /* CASES */
 /* lists of 3 items: CASE labels (CASE_LABELS), colon,
    and statements (STATEMENTS), every 3 items separated with vertical bars */
-CASES: CASES '|' CASE_LABELS ':' STATEMENTS
+CASES: CASE_LABELS ':' STATEMENTS
+     | CASES '|' CASE_LABELS ':' STATEMENTS
 ;
 
 /* CASE_LABELS */

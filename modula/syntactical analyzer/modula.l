@@ -45,6 +45,7 @@ THEN  return process_token(yytext, "KW_THEN", "", KW_THEN);
 TYPE  return process_token(yytext, "KW_TYPE", "", KW_TYPE);
 TO  return process_token(yytext, "KW_TO", "", KW_TO);
 VAR return process_token(yytext, "KW_VAR", "", KW_VAR);
+PROCEDURE return process_token(yytext, "KW_PROCEDURE", "", KW_PROCEDURE);
 WHILE return process_token(yytext, "KW_WHILE", "", KW_WHILE);
 REPEAT  return process_token(yytext, "KW_REPEAT", "", KW_REPEAT);
 UNTIL return process_token(yytext, "KW_UNTIL", "", KW_UNTIL);
