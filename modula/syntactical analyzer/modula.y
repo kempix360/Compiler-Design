@@ -294,6 +294,7 @@ EXPR: SIMPLE_EXPR
 REL_OP: '='
       | '<'
       | '>'
+      | '#'
       | NEQ
       | LE
       | GE
@@ -334,18 +335,19 @@ FACTOR: INTEGER_CONST
       | REAL_CONST
       | STRING_CONST
       | CHAR_CONST
+      | IDENT QUALIF
       | QUALIDENT
       | PROCEDURE_CALL
       | '(' EXPR ')'
       | KW_NOT FACTOR
-      | '-' FACTOR
+      | '-' FACTOR %prec NEG
 ;
 
 /* FOR_STATEMENT */
  /* Sequence: keyword FOR, identifier, assignment operator (ASSIGN),
     expression, TO or DOWNTO (TO_DOWNTO), expression, keyword DO,
    statements (STATEMENTS), and keyword END */
-FOR_STATEMENT: KW_FOR IDENT ASSIGN EXPR TO_DOWNTO EXPR KW_DO STATEMENTS KW_END { found("FOR_STATEMENT", $1); } 
+FOR_STATEMENT: KW_FOR IDENT ASSIGN EXPR TO_DOWNTO EXPR KW_DO STATEMENTS KW_END { found("FOR_STATEMENT", $2); } 
 ;
 
 /* TO_DOWNTO */
@@ -358,7 +360,7 @@ TO_DOWNTO: KW_TO
 /* Sequence: keyword IF, expression,
    keyword THEN, statements (STATEMENTS),  ELSIF part (ELSIFS),
    ELSE part (ELSE_PART), and keyword END */
-IF_STATEMENT: KW_IF EXPR KW_THEN STATEMENTS ELSIFS ELSE_PART KW_END { found("IF_STATEMENT", $1); } 
+IF_STATEMENT: KW_IF EXPR KW_THEN STATEMENTS ELSIFS ELSE_PART KW_END { found("IF_STATEMENT", ""); } 
 ;
 
 /* ELSIFS */
@@ -377,24 +379,24 @@ ELSE_PART: %empty
 /* WHILE_STATEMENT */
 /* keyword WHILE (KW_WHILE), expression (EXPR), keyword DO (KW_DO),
    statements (STATEMENTS), and keyword END (KW_END) */
-WHILE_STATEMENT: KW_WHILE EXPR KW_DO STATEMENTS KW_END { found("WHILE_STATEMENT", $1); }
+WHILE_STATEMENT: KW_WHILE EXPR KW_DO STATEMENTS KW_END { found("WHILE_STATEMENT", ""); }
 ;
 
 /* REPEAT_STATEMENT */
 /* keyword REPEAT (KW_REPEAT), statements (STATEMENTS),
    keyword UNTIL (KW_UNTIL), and expression (EXPR) */
-REPEAT_STATEMENT: KW_REPEAT STATEMENTS KW_UNTIL EXPR { found("REPEAT_STATEMENT", $1); }
+REPEAT_STATEMENT: KW_REPEAT STATEMENTS KW_UNTIL EXPR { found("REPEAT_STATEMENT", ""); }
 ;
 
 /* LOOP_STATEMENT */
 /* keyword LOOP (KW_LOOP), statements (STATEMENTS), and keyword end (KW_END) */
-LOOP_STATEMENT: KW_LOOP STATEMENTS KW_END { found("LOOP_STATEMENT", $1); }
+LOOP_STATEMENT: KW_LOOP STATEMENTS KW_END { found("LOOP_STATEMENT", ""); }
 ;
 
 /* CASE_STATEMENT */
 /* keyword CASE (KW_CASE), expression (EXPR), keyword OF,
    cases (CASES), ELSE part (ELSE_PART), and keyword END */
-CASE_STATEMENT: KW_CASE EXPR KW_OF CASES ELSE_PART KW_END { found("CASE_STATEMENT", $1); }
+CASE_STATEMENT: KW_CASE EXPR KW_OF CASES ELSE_PART KW_END { found("CASE_STATEMENT", ""); }
 ;
 
 /* CASES */

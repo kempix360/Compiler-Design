@@ -161,4 +161,218 @@ i                   IDENT           i
 WriteLn             IDENT           WriteLn
 END                 KW_END          
 ===== FOUND: PROCEDURE_CALL 'WriteLn'=====
-Segmentation fault (core dumped)
+===== FOUND: FOR_STATEMENT 'i'=====
+;                   ;               
+t1                  IDENT           t1
+[                   [               
+0                   INTEGER_CONST   0
+]                   ]               
+:=                  ASSIGN          
+t                   IDENT           t
+[                   [               
+0                   INTEGER_CONST   0
+]                   ]               
+;                   ;               
+===== FOUND: ASSIGNMENT 't1'=====
+d                   IDENT           d
+.                   .               
+year                IDENT           year
+:=                  ASSIGN          
+2018                INTEGER_CONST   2018
+END                 KW_END          
+===== FOUND: ASSIGNMENT 'd'=====
+ListAscii           IDENT           ListAscii
+===== FOUND: PROC_DECL =====
+;                   ;               
+BEGIN               KW_BEGIN        
+fl                  IDENT           fl
+:=                  ASSIGN          
+1.1                 FLOAT_CONST     1.1
++                   +               
+1.0E-2              FLOAT_CONST     1.0E-2
++                   +               
+1.0E+2              FLOAT_CONST     1.0E+2
++                   +               
+1.0E1               FLOAT_CONST     1.0E1
+;                   ;               
+===== FOUND: ASSIGNMENT 'fl'=====
+IF                  KW_IF           
+(                   (               
+fl                  IDENT           fl
+<=                  LE              
+11.11               FLOAT_CONST     11.11
+)                   )               
+AND                 KW_AND          
+(                   (               
+fl                  IDENT           fl
+>=                  GE              
+1.111E1             FLOAT_CONST     1.111E1
+)                   )               
+THEN                KW_THEN         
+WriteString         IDENT           WriteString
+(                   (               
+"As expected!"      STRING_CONST    "As expected!"
+)                   )               
+===== FOUND: PROCEDURE_CALL 'WriteString'=====
+ELSE                KW_ELSE         
+WriteString         IDENT           WriteString
+(                   (               
+"Gosh!"             STRING_CONST    "Gosh!"
+)                   )               
+===== FOUND: PROCEDURE_CALL 'WriteString'=====
+END                 KW_END          
+===== FOUND: IF_STATEMENT =====
+;                   ;               
+WriteLn             IDENT           WriteLn
+;                   ;               
+===== FOUND: PROCEDURE_CALL 'WriteLn'=====
+i                   IDENT           i
+:=                  ASSIGN          
+1                   INTEGER_CONST   1
+;                   ;               
+===== FOUND: ASSIGNMENT 'i'=====
+WHILE               KW_WHILE        
+i                   IDENT           i
+<                   <               
+5                   INTEGER_CONST   5
+DO                  KW_DO           
+WriteLn             IDENT           WriteLn
+(                   (               
+i                   IDENT           i
+)                   )               
+===== FOUND: PROCEDURE_CALL 'WriteLn'=====
+;                   ;               
+i                   IDENT           i
+:=                  ASSIGN          
+i                   IDENT           i
++                   +               
+1                   INTEGER_CONST   1
+END                 KW_END          
+===== FOUND: ASSIGNMENT 'i'=====
+===== FOUND: WHILE_STATEMENT =====
+;                   ;               
+REPEAT              KW_REPEAT       
+WriteLn             IDENT           WriteLn
+(                   (               
+i                   IDENT           i
+)                   )               
+===== FOUND: PROCEDURE_CALL 'WriteLn'=====
+;                   ;               
+i                   IDENT           i
+:=                  ASSIGN          
+i                   IDENT           i
+-                   -               
+1                   INTEGER_CONST   1
+UNTIL               KW_UNTIL        
+===== FOUND: ASSIGNMENT 'i'=====
+i                   IDENT           i
+=                   =               
+1                   INTEGER_CONST   1
+;                   ;               
+===== FOUND: REPEAT_STATEMENT =====
+LOOP                KW_LOOP         
+WriteLn             IDENT           WriteLn
+(                   (               
+"Spam"              STRING_CONST    "Spam"
+)                   )               
+===== FOUND: PROCEDURE_CALL 'WriteLn'=====
+END                 KW_END          
+===== FOUND: LOOP_STATEMENT =====
+;                   ;               
+CASE                KW_CASE         
+CHR                 IDENT           CHR
+(                   (               
+FromAscii           IDENT           FromAscii
++                   +               
+16                  INTEGER_CONST   16
+)                   )               
+===== FOUND: PROCEDURE_CALL 'CHR'=====
+OF                  KW_OF           
+'0'                 CHAR_CONST      '0'
+:                   :               
+WriteLn             IDENT           WriteLn
+(                   (               
+"Aha!"              STRING_CONST    "Aha!"
+)                   )               
+===== FOUND: PROCEDURE_CALL 'WriteLn'=====
+|                   |               
+'A'                 CHAR_CONST      'A'
+,                   ,               
+'a'                 CHAR_CONST      'a'
+:                   :               
+Writeln             IDENT           Writeln
+(                   (               
+"Yes?"              STRING_CONST    "Yes?"
+)                   )               
+===== FOUND: PROCEDURE_CALL 'Writeln'=====
+ELSE                KW_ELSE         
+Writeln             IDENT           Writeln
+(                   (               
+"O!"                STRING_CONST    "O!"
+)                   )               
+===== FOUND: PROCEDURE_CALL 'Writeln'=====
+END                 KW_END          
+===== FOUND: CASE_STATEMENT =====
+;                   ;               
+t                   IDENT           t
+[                   [               
+10                  INTEGER_CONST   10
+]                   ]               
+:=                  ASSIGN          
+10                  INTEGER_CONST   10
+;                   ;               
+===== FOUND: ASSIGNMENT 't'=====
+FOR                 KW_FOR          
+i                   IDENT           i
+:=                  ASSIGN          
+9                   INTEGER_CONST   9
+DOWNTO              KW_DOWNTO       
+1                   INTEGER_CONST   1
+DO                  KW_DO           
+t                   IDENT           t
+[                   [               
+i                   IDENT           i
+]                   ]               
+:=                  ASSIGN          
+t                   IDENT           t
+[                   [               
+i                   IDENT           i
++                   +               
+1                   INTEGER_CONST   1
+]                   ]               
+*                   *               
+i                   IDENT           i
+*                   *               
+i                   IDENT           i
+END                 KW_END          
+===== FOUND: ASSIGNMENT 't'=====
+===== FOUND: FOR_STATEMENT 'i'=====
+;                   ;               
+d                   IDENT           d
+.                   .               
+year                IDENT           year
+:=                  ASSIGN          
+2018                INTEGER_CONST   2018
+;                   ;               
+===== FOUND: ASSIGNMENT 'd'=====
+d                   IDENT           d
+.                   .               
+day                 IDENT           day
+:=                  ASSIGN          
+1                   INTEGER_CONST   1
+;                   ;               
+===== FOUND: ASSIGNMENT 'd'=====
+d                   IDENT           d
+.                   .               
+month               IDENT           month
+:=                  ASSIGN          
+d                   IDENT           d
+.                   .               
+day                 IDENT           day
+*                   *               
+10                  INTEGER_CONST   10
+END                 KW_END          
+===== FOUND: ASSIGNMENT 'd'=====
+test                IDENT           test
+.                   .               
+===== FOUND: PROGRAM_MODULE 'test'=====
