@@ -5,8 +5,6 @@
 #include "defs.h"
 #include "x.tab.h"
 
-#define CHAR_LITERAL(ch) (strdup(ch))
-
 %}
 
 IDENT    [a-zA-Z:_][a-zA-Z0-9:_-]*
@@ -18,46 +16,39 @@ IDENT    [a-zA-Z:_][a-zA-Z0-9:_-]*
 %%
 
  /* 1. comments */
-"<!--"            { BEGIN(ST_COMMENT); }
-<ST_COMMENT>{
-    "-->"          { BEGIN(INITIAL); }
-    [^-]|-[^-]     { }
-    "-"            { }
-    \n             { }
-}
+"<!--"  BEGIN(ST_COMMENT);
+<ST_COMMENT>"-->"      BEGIN(INITIAL);
+<ST_COMMENT>[^-]|-[^-] ;
+<ST_COMMENT>"-"        ;
+<ST_COMMENT>\n         ;
 
  /* 2. instructions */
-"<?"              { BEGIN(ST_PI); return PI_TAG_BEG; }
-<ST_PI>{
-    {IDENT}        { strncpy(yylval.s, yytext, MAX_STR_LEN); return IDENT; }
-    "?>"           { BEGIN(INITIAL); return PI_TAG_END; }
-    .|\n           { }
-}
+"<?"{IDENT}     { BEGIN(ST_PI); strncpy(yylval.s, yytext, MAX_STR_LEN); return PI_TAG_BEG; }
+
+<ST_PI>"?>"     { BEGIN(INITIAL); return PI_TAG_END; }
+<ST_PI>.|\n     ;
 
  /* 3. tags */
-"<"                { BEGIN(ST_TAG); return STAG_BEG; }
-"</"               { BEGIN(ST_TAG); return ETAG_BEG; }
+"<"{IDENT}     { BEGIN(ST_TAG); strncpy(yylval.s, yytext, MAX_STR_LEN); return STAG_BEG; }
+"</"{IDENT}    { BEGIN(ST_TAG); strncpy(yylval.s, yytext, MAX_STR_LEN); return ETAG_BEG; }
 
-<ST_TAG>{
-    {IDENT}        { yylval.s = yytext; return IDENT; }
-    ">"            { BEGIN(INITIAL); return TAG_END; }
-    "/>"           { BEGIN(INITIAL); return ETAG_END; }
-    .|\n           { }
-}
+<ST_TAG>">"         { BEGIN(INITIAL); return TAG_END; }
+<ST_TAG>"/>"        { BEGIN(INITIAL); return ETAG_END; }
+<ST_TAG>.|\n        ;
 
  /* 4. entities */
-"&lt;"           { yylval.s = CHAR_LITERAL("<"); return CHAR; }
-"&gt;"           { yylval.s = CHAR_LITERAL(">"); return CHAR; }
-"&amp;"          { yylval.s = CHAR_LITERAL("&"); return CHAR; }
-"&apos;"         { yylval.s = CHAR_LITERAL("'"); return CHAR; }
-"&quote;"        { yylval.s = CHAR_LITERAL("\""); return CHAR; }
+"&lt;"           { strncpy(yylval.s, "<", MAX_STR_LEN); return CHAR; }
+"&gt;"           { strncpy(yylval.s, ">", MAX_STR_LEN); return CHAR; }
+"&amp;"          { strncpy(yylval.s, "&", MAX_STR_LEN); return CHAR; }
+"&apos;"         { strncpy(yylval.s, "'", MAX_STR_LEN); return CHAR; }
+"&quote;"        { strncpy(yylval.s, "\"", MAX_STR_LEN); return CHAR; }
 
 
-^[ \t]+          { }
-\n               { return '\n'; } 
-\r               { }
-[ \t]            { yylval.s = yytext; return S; }
-.                { yylval.s = CHAR_LITERAL(yytext); return CHAR; }
+^[ \t]+          ;
+\n               return '\n';
+\r               ;
+[ \t]            { strncpy(yylval.s, yytext, MAX_STR_LEN); return S; }
+.                { strncpy(yylval.s, yytext, MAX_STR_LEN); return CHAR; }
 
 %%
 
