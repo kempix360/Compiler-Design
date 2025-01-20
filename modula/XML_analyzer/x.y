@@ -9,6 +9,8 @@ int pos = 0;   // current column
 #define INDENT_LENGTH 2
 #define LINE_WIDTH 78
 
+extern int yylex(void);
+extern void yyerror(const char *msg);
 void indent(int level);
 %}
 
@@ -24,11 +26,13 @@ void indent(int level);
 document: preamble element
 ;
 
-preamble: processing_instruction '\n' preamble
+preamble: | processing_instruction '\n' preamble
 ;
 
 processing_instruction: PI_TAG_BEG PI_TAG_END
-{ printf("Processing instruction detected\n"); }
+{ 
+    printf("Processing instruction detected\n"); 
+}
 ;
 
 element: STAG_BEG ETAG_END | tag_pair
@@ -45,19 +49,18 @@ start_tag: STAG_BEG TAG_END
 {
     indent(level++);
     printf("<%s>\n", $1);
-    $$ = $1;
 }
 ;
 
 end_tag: ETAG_BEG TAG_END
 {
-    $$ = $1;
 }
 ;
 
-content:    | content CHAR { printf("%s", $2); } 
-            | content S { printf(" "); }
-            | content '\n' { printf("\n"); }
+content:    | element content
+            | CHAR content { printf("%s", $1); } 
+            | S content { printf(" "); }
+            | '\n' content { printf("\n"); }
 ;
 
 %%

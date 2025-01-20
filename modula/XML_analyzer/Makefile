@@ -12,4 +12,3 @@ LEX=flex
 	$(LEX) -t $< > $@
 
 x: x.y x.l
-
